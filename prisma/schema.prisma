@@ -1,0 +1,206 @@
+// NICE — Network of Insurance & Claims Expert
+// Insurance advisory platform
+// Prisma schema (PostgreSQL via Neon)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ProductType {
+  TRUCK
+  CAR
+  BIKE
+  HEALTH
+  HOME
+  OFFICE
+  SHOP
+  TRAVEL
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  ADVISED
+  KYC_PENDING
+  PAYMENT_PENDING
+  SUBMITTED
+  UNDERWRITING
+  ISSUED
+  REJECTED
+  LOST
+}
+
+enum KycDocType {
+  PAN
+  AADHAAR
+}
+
+enum KycStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
+enum PolicyStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  ISSUED
+  REJECTED
+}
+
+model Advisor {
+  id            String   @id @default(cuid())
+  clerkUserId   String   @unique
+  name          String
+  email         String   @unique
+  irdaiLicense  String?
+  commissionPct Float    @default(10)
+  createdAt     DateTime @default(now())
+
+  leads Lead[]
+}
+
+model Lead {
+  id          String      @id @default(cuid())
+  name        String
+  phone       String
+  email       String?
+  city        String?
+  source      String      @default("Website")
+  productType ProductType?
+  status      LeadStatus  @default(NEW)
+  advisorNote String?
+
+  advisorId String?
+  advisor   Advisor? @relation(fields: [advisorId], references: [id])
+
+  profile   CustomerProfile?
+  quotations Quotation[]
+  kycDocuments KycDocument[]
+  familyMembers FamilyMember[]
+  payments  Payment[]
+  policy    Policy?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CustomerProfile {
+  id             String   @id @default(cuid())
+  leadId         String   @unique
+  lead           Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  age            Int
+  gender         String
+  city           String
+  sumAssured     Int
+
+  // Health insurance specific
+  familySize         Int      @default(1)
+  preExisting        Boolean  @default(false)
+  preExistingDetails String?
+  policyType         String?  // INDIVIDUAL | FLOATER
+  existingPolicy     Boolean  @default(false)
+  roomRentPreference String?  // e.g. "Single Private AC"
+
+  // Motor (truck / car / bike) insurance specific
+  vehicleAgeYrs        Int?
+  vehicleRegistration  String?
+  vehicleMake          String?
+  vehicleModel         String?
+  idv                  Int?     // Insured Declared Value
+  previousInsurer      String?
+  ncbPercent           Int?     // No Claim Bonus %
+
+  // Property / business (home / office / shop) insurance specific
+  propertyType    String?  // APARTMENT | HOUSE | BUNGALOW | SHOP | OFFICE
+  propertyAddress String?
+  businessType    String?
+
+  // Travel insurance specific
+  travelDestination String?
+  travelDays        Int?
+  travellers        Int?   @default(1)
+
+  createdAt DateTime @default(now())
+}
+
+model FamilyMember {
+  id       String  @id @default(cuid())
+  leadId   String
+  lead     Lead    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  name     String
+  relation String
+  dob      DateTime?
+}
+
+model Quotation {
+  id                   String   @id @default(cuid())
+  leadId               String
+  lead                 Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  insurerCode          String
+  insurerName          String
+  planName             String
+  premiumPerYear        Int
+  coverAmount          Int
+  policyTermYears      Int
+  claimSettlementRatio String?
+  highlight            String?
+  selected             Boolean  @default(false)
+  source               String   @default("ai_estimate") // ai_estimate | fallback_estimate | insurer_api | manual
+
+  createdAt DateTime @default(now())
+}
+
+model KycDocument {
+  id           String     @id @default(cuid())
+  leadId       String
+  lead         Lead       @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type         KycDocType
+  valueMasked  String     // e.g. XXXX XXXX 1234, or ABCDE****F
+  status       KycStatus  @default(PENDING)
+  verifiedAt   DateTime?
+  createdAt    DateTime   @default(now())
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  leadId            String
+  lead              Lead          @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  amount            Int
+  status            PaymentStatus @default(CREATED)
+  createdAt         DateTime      @default(now())
+}
+
+model Policy {
+  id           String       @id @default(cuid())
+  leadId       String       @unique
+  lead         Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  policyNumber String       @unique
+  insurerCode  String
+  insurerName  String
+  planName     String
+  coverAmount  Int
+  premium      Int
+  status       PolicyStatus @default(SUBMITTED)
+  documentUrl  String?
+  issuedAt     DateTime?
+  createdAt    DateTime     @default(now())
+}

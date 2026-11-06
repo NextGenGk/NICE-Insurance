@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F3F8F9;
+  --surface: #ffffff;
+  --ink: #0F2A2E;
+  --ink-soft: #3F5D63;
+  --ink-faint: #7A979D;
+  --green: #009FAF;
+  --green-dark: #01718B;
+  --green-darker: #015A6E;
+  --green-light: #E6F4F6;
+  --green-bg: #EEF7F9;
+  --border: #D3E6EA;
+  --success: #009FAF;
+  --success-bg: #E6F4F6;
+  --danger: #B3423E;
+  --danger-bg: #FBEAEA;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-ink: var(--ink);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono-brand: var(--font-mono-brand);
+}
+
+body {
+  background: var(--background);
+  color: var(--ink);
+  font-family: var(--font-body), sans-serif;
+}
+
+/* Premium custom select dropdown */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233F5D63' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  padding-right: 36px !important;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.15s ease;
+}
+
+select:hover {
+  border-color: #9AC4CA;
+  background-color: #FAFDFB;
+}
+
+select:focus {
+  border-color: #009FAF;
+  box-shadow: 0 0 0 3px rgba(0, 159, 175, 0.12);
+}
+
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Premium input styling */
+input, textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, textarea:focus {
+  box-shadow: 0 0 0 3px rgba(0, 159, 175, 0.12);
+}
+
+/* Smooth page transitions */
+main {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Insurer logo badge — guaranteed background rendering */
+.insurer-badge {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 12px !important;
+  color: white !important;
+  font-weight: 700 !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+}
