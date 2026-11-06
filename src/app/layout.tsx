@@ -21,10 +21,23 @@ const plexMono = IBM_Plex_Mono({
   variable: "--font-mono-brand",
 });
 
+const appUrl =
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://niceinsurance.frequnsync.online";
+
+const description =
+  "Insurance advisory workspace for NICE – Network of Insurance & Claims Expert, Raipur, Chhattisgarh. Truck, car, bike, health, home, office, shop and travel insurance.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(appUrl),
   title: "NICE – Network of Insurance & Claims Expert | Insurance Advisory Workspace",
-  description:
-    "Insurance advisory workspace for NICE – Network of Insurance & Claims Expert, Raipur, Chhattisgarh. Truck, car, bike, health, home, office, shop and travel insurance.",
+  description,
+  openGraph: {
+    title: "NICE – Network of Insurance & Claims Expert",
+    description,
+    url: appUrl,
+    siteName: "NICE – Network of Insurance & Claims Expert",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

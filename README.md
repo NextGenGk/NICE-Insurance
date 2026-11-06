@@ -77,6 +77,8 @@ cp .env.example .env
 # required for the app to run at all. GROQ_API_KEY and Razorpay keys
 # are optional; the app falls back to local estimates / mock payments
 # without them.
+# NEXT_PUBLIC_APP_URL is the canonical origin used for metadata and
+# share links; it defaults to https://niceinsurance.frequnsync.online.
 
 npx prisma generate
 npx prisma migrate dev --name nice_products
